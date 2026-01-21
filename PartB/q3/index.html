@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Management System</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        form { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; width: 350px; }
+        input { width: 90%; margin-bottom: 10px; padding: 5px; }
+        button { padding: 8px 15px; cursor: pointer; background-color: #f0f0f0; width: 100%; }
+        #results { margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>1. Add New Employee</h2>
+    <form id="empForm">
+        <input type="text" id="name" placeholder="Employee Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="phone" placeholder="Phone Number" required>
+        <input type="date" id="hdate" required>
+        <input type="text" id="title" placeholder="Job Title" required>
+        <input type="number" id="salary" placeholder="Salary" required>
+        <button type="submit">Store Employee</button>
+    </form>
+
+    <h2>2. View Options</h2>
+    <div style="width: 380px;">
+        <button onclick="getHighSalary()">Show Salary > 50,000</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- 1. POST Request (Add Employee) ---
+        document.getElementById("empForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const data = {
+                emp_name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                hire_date: document.getElementById("hdate").value,
+                job_title: document.getElementById("title").value,
+                salary: document.getElementById("salary").value
+            };
+
+            const res = await fetch("/add-employee", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            if(res.ok) alert("Employee Added!");
+        });
+
+        // --- 2. GET Request (Filter Results) ---
+        async function getHighSalary() {
+            const res = await fetch("/high-salary");
+            const emps = await res.json();
+            const display = document.getElementById("results");
+            
+            //or we can directly console.log(emps);
+            console.log(emps);
+            
+            //or answer display on the webpage
+            display.innerHTML = "<strong>High Salary Employees:</strong><br>";
+            emps.forEach(e => {
+                display.innerHTML += `<p>${e.emp_name} - ${e.job_title} ($${e.salary})</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

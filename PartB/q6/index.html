@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Management</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Hospital</h3>
+        <input type="text" id="hid" placeholder="Hospital ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="loc" placeholder="Location">
+        <input type="number" id="total" placeholder="Total Beds">
+        <input type="number" id="occ" placeholder="Occupied Beds">
+        <button onclick="addHospital()">Submit Hospital</button>
+    </div>
+
+    <div class="box">
+        <h3>2. Admit Patient</h3>
+        <input type="text" id="admitId" placeholder="Enter Hospital ID">
+        <button onclick="admitPatient()">Admit Patient (+1 Occupied)</button>
+    </div>
+
+    <div class="box">
+        <h3>3. View Low Availability (< 10 Beds)</h3>
+        <button onclick="checkBeds()" style="background: #f8d7da;">Check Low Beds</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- POST Request (Add) ---
+        async function addHospital() {
+            const data = {
+                Hospital_ID: document.getElementById("hid").value,
+                Name: document.getElementById("name").value,
+                Location: document.getElementById("loc").value,
+                Total_Beds: document.getElementById("total").value,
+                Occupied_Beds: document.getElementById("occ").value
+            };
+            const res = await fetch("/add-hospital", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- POST Request (Admit/Update) ---
+        async function admitPatient() {
+            const data = { Hospital_ID: document.getElementById("admitId").value };
+            
+            const res = await fetch("/admit-patient", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function checkBeds() {
+            const res = await fetch("/low-beds");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            console.log(list);
+            //or you can use innerText as below
+            display.innerHTML = "<strong>Low Bed Availability:</strong><br>";
+            list.forEach(h => {
+                let available = h.Total_Beds - h.Occupied_Beds;
+                display.innerHTML += `<p>${h.Name}: ${available} beds left</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

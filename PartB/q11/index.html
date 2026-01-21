@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance System</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Student Attendance</h3>
+        <input type="text" id="sid" placeholder="Student ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="course" placeholder="Course">
+        <input type="number" id="total" placeholder="Total Classes Held">
+        <input type="number" id="attended" placeholder="Classes Attended">
+        <button onclick="addStudent()">Calculate & Save</button>
+    </div>
+
+    <div class="box">
+        <h3>2. View Low Attendance (< 75%)</h3>
+        <button onclick="viewLow()">Check Defaulters</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addStudent() {
+            const data = {
+                Student_ID: document.getElementById("sid").value,
+                Name: document.getElementById("name").value,
+                Course: document.getElementById("course").value,
+                Total_Attendance: document.getElementById("total").value,
+                Classes_Attended: document.getElementById("attended").value
+            };
+            
+            const res = await fetch("/add-student", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewLow() {
+            const res = await fetch("/low-attendance");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            display.innerHTML = "<strong>Attendance Below 75%:</strong><br>";
+            if(list.length === 0) display.innerHTML += "No students found.";
+            
+            list.forEach(s => {
+                // toFixed(2) cuts the number to 2 decimal places (e.g., 66.67)
+                display.innerHTML += `<p>${s.Name}: ${s.Attendance_Percentage.toFixed(2)}%</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Startup Portal</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Submit Startup Idea</h3>
+        <input type="text" id="sid" placeholder="ID">
+        <input type="text" id="team" placeholder="Team Name">
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="domain" placeholder="Domain (e.g., EdTech)">
+        <input type="number" id="fund" placeholder="Funding Required">
+        <button onclick="addIdea()">Submit Idea</button>
+    </div>
+
+    <div class="box">
+        <h3>2. View High Funding EdTech (> 5 Lakhs)</h3>
+        <button onclick="viewFiltered()" style="background: #fff3cd;">Find Startups</button>
+        <div id="results" style="margin-top:10px;"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addIdea() {
+            const data = {
+                ID: document.getElementById("sid").value,
+                Team_Name: document.getElementById("team").value,
+                Title: document.getElementById("title").value,
+                Domain: document.getElementById("domain").value,
+                Funding_Required: document.getElementById("fund").value
+            };
+            
+            const res = await fetch("/add-idea", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewFiltered() {
+            const res = await fetch("/high-funding-edtech");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            display.innerHTML = "<strong>EdTech Startups (> 5L):</strong><br>";
+            if(list.length === 0) display.innerHTML += "No matches found.";
+            
+            list.forEach(i => {
+                display.innerHTML += `<p>${i.Team_Name}: ₹${i.Funding_Required}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

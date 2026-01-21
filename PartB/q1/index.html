@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complaint Management</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; width: 350px; }
+        input, select { width: 100%; margin: 5px 0 15px 0; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px; cursor: pointer; background: #eee; border: 1px solid #aaa; }
+    </style>
+</head>
+<body>
+
+    <div class="section">
+        <h3>1. Submit Complaint</h3>
+        <input type="text" id="cId" placeholder="Complaint ID">
+        <input type="text" id="uName" placeholder="User Name">
+        <input type="text" id="issue" placeholder="Issue Description">
+        <button onclick="submitComplaint()">Submit</button>
+    </div>
+
+    <div class="section">
+        <h3>2. Update Status</h3>
+        <input type="text" id="upId" placeholder="Complaint ID to update">
+        <select id="statusSelect">
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+        </select>
+        <button onclick="updateStatus()">Update Status</button>
+    </div>
+
+    <div class="section">
+        <h3>3. View Pending</h3>
+        <button onclick="viewPending()">Refresh Pending List</button>
+        <div id="display"></div>
+    </div>
+
+    <script>
+        // POST Request
+        async function submitComplaint() {
+            const data = {
+                complaintId: document.getElementById("cId").value,
+                userName: document.getElementById("uName").value,
+                issue: document.getElementById("issue").value
+            };
+            await fetch("/submit-complaint", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            alert("Submitted!");
+        }
+
+        // PUT Request
+        async function updateStatus() {
+            const data = {
+                complaintId: document.getElementById("upId").value,
+                newStatus: document.getElementById("statusSelect").value
+            };
+            await fetch("/update-status", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            alert("Updated!");
+        }
+
+        // GET Request
+        async function viewPending() {
+            const res = await fetch("/pending-complaints");
+            const complaints = await res.json();
+            const div = document.getElementById("display");
+            
+            div.innerHTML = complaints.map(c => 
+                `<p><b>${c.complaintId}</b>: ${c.issue} (By: ${c.userName})</p>`
+            ).join("");
+        }
+    </script>
+</body>
+</html>

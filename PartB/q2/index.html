@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Portal</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+        #display { margin-top: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>Submit Student Details</h3>
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="usn" placeholder="USN">
+        <input type="text" id="sem" placeholder="Semester">
+        <input type="number" id="fee" placeholder="Exam Fee (0 if unpaid)">
+        <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <div class="box">
+        <h3>Admin Actions</h3>
+        <button onclick="viewStudents()" style="background: #e1f5fe;">View All Students</button>
+        <button onclick="clearUnpaid()" style="background: #ffebee; margin-top: 10px;">Delete Unpaid</button>
+        <div id="display"></div>
+    </div>
+
+    <script>
+        // 1. POST Request
+        async function addStudent() {
+            const data = {
+                Student_name: document.getElementById("name").value,
+                USN: document.getElementById("usn").value,
+                Semester: document.getElementById("sem").value,
+                Exam_fee: document.getElementById("fee").value
+            };
+            const res = await fetch("/add-student", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // 2. DELETE Request
+        async function clearUnpaid() {
+            const res = await fetch("/delete-unpaid", { method: "DELETE" });
+            const result = await res.json();
+            alert(result.message);
+            viewStudents(); // Refresh list after deletion
+        }
+
+        // 3. GET Request (View Option)
+        async function viewStudents() {
+            const res = await fetch("/view-students");
+            const students = await res.json();
+            const div = document.getElementById("display");
+            
+            div.innerHTML = "<strong>Student List:</strong><br>";
+            students.forEach(s => {
+                div.innerHTML += `${s.USN} - ${s.Student_name} (Fee: ${s.Exam_fee})<br>`;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Manager</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Product</h3>
+        <input type="text" id="pid" placeholder="Product ID">
+        <input type="text" id="name" placeholder="Product Name">
+        <input type="number" id="price" placeholder="Price">
+        <input type="number" id="disc" placeholder="Discount (%)">
+        <input type="number" id="stock" placeholder="Stock">
+        <button onclick="addProduct()">Calculate & Save</button>
+    </div>
+
+    <div class="box">
+        <h3>2. View Cheap Products (< 1000)</h3>
+        <button onclick="viewCheap()">Find Products</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addProduct() {
+            const data = {
+                Product_ID: document.getElementById("pid").value,
+                Name: document.getElementById("name").value,
+                Price: document.getElementById("price").value,
+                Discount: document.getElementById("disc").value,
+                Stock: document.getElementById("stock").value
+            };
+            
+            const res = await fetch("/add-product", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewCheap() {
+            const res = await fetch("/cheap-products");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            console.log(list);
+            //or 
+            display.innerHTML = "<strong>Products under 1000:</strong><br>";
+            list.forEach(p => {
+                display.innerHTML += `<p>${p.Name}: ${p.Final_Price} (Original: ${p.Price})</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

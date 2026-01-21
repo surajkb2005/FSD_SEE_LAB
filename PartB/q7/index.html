@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Enrollment</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. New Enrollment</h3>
+        <input type="text" id="sid" placeholder="Student ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="cname" placeholder="Course Name">
+        <input type="text" id="dur" placeholder="Duration">
+        <input type="text" id="stat" placeholder="Status (e.g., active)">
+        <button onclick="enrollStudent()">Submit Enrollment</button>
+    </div>
+
+    <div class="box">
+        <h3>2. Update Status</h3>
+        <input type="text" id="updateId" placeholder="Enter Student ID to Complete">
+        <button onclick="markCompleted()">Mark as Completed</button>
+    </div>
+
+    <div class="box">
+        <h3>3. View Active Courses</h3>
+        <button onclick="viewActive()">Show Active Enrollments</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function enrollStudent() {
+            const data = {
+                Student_ID: document.getElementById("sid").value,
+                Name: document.getElementById("name").value,
+                Course_Name: document.getElementById("cname").value,
+                Duration: document.getElementById("dur").value,
+                Status: document.getElementById("stat").value
+            };
+            const res = await fetch("/enroll", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- PUT Request ---
+        async function markCompleted() {
+            const data = { Student_ID: document.getElementById("updateId").value };
+            
+            const res = await fetch("/complete-course", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewActive() {
+            const res = await fetch("/active-courses");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            console.log(list);
+            //or 
+            display.innerHTML = "<strong>Active Enrollments:</strong><br>";
+            list.forEach(item => {
+                display.innerHTML += `<p>${item.Name} (${item.Course_Name})</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

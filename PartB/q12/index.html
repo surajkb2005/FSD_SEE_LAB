@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Management</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Student Marks</h3>
+        <input type="text" id="sid" placeholder="Student ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="sub" placeholder="Subject">
+        <input type="number" id="marks" placeholder="Marks">
+        <button onclick="addStudent()">Submit (Auto-Calculate Status)</button>
+    </div>
+
+    <div class="box">
+        <h3>2. View Not Eligible (Marks < 20)</h3>
+        <button onclick="viewNotEligible()">Check Ineligible Students</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addStudent() {
+            const data = {
+                Student_ID: document.getElementById("sid").value,
+                Name: document.getElementById("name").value,
+                Subject: document.getElementById("sub").value,
+                Marks: document.getElementById("marks").value
+            };
+            
+            const res = await fetch("/add-student", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewNotEligible() {
+            const res = await fetch("/not-eligible");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            display.innerHTML = "<strong>Not Eligible Students:</strong><br>";
+            if(list.length === 0) display.innerHTML += "Everyone is eligible!";
+            
+            list.forEach(s => {
+                display.innerHTML += `<p>${s.Name} (${s.Subject}): ${s.Marks} marks</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

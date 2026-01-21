@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Internship Tracker</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input, select { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Internship</h3>
+        <input type="text" id="sid" placeholder="Student ID">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="comp" placeholder="Company (e.g., Infosys)">
+        <input type="text" id="dur" placeholder="Duration">
+        <input type="text" id="stat" placeholder="Status (e.g., Ongoing)">
+        <button onclick="addIntern()">Submit</button>
+    </div>
+
+    <div class="box">
+        <h3>2. Update Status</h3>
+        <input type="text" id="updateId" placeholder="Enter Student ID to Complete">
+        <button onclick="markCompleted()" style="background: #fff3cd;">Mark as Completed</button>
+    </div>
+
+    <div class="box">
+        <h3>3. View Infosys Interns</h3>
+        <button onclick="viewInfosys()" style="background: #d1ecf1;">Show Infosys Students</button>
+        <div id="results" style="margin-top:10px;"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addIntern() {
+            const data = {
+                Student_ID: document.getElementById("sid").value,
+                Name: document.getElementById("name").value,
+                Company: document.getElementById("comp").value,
+                Duration: document.getElementById("dur").value,
+                Status: document.getElementById("stat").value
+            };
+            const res = await fetch("/add-internship", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- PUT Request ---
+        async function markCompleted() {
+            const data = { Student_ID: document.getElementById("updateId").value };
+            
+            const res = await fetch("/mark-completed", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewInfosys() {
+            const res = await fetch("/infosys-interns");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            //console directly or display the results on the page as below
+            display.innerHTML = "<strong>Infosys Interns:</strong><br>";
+            list.forEach(item => {
+                display.innerHTML += `<p>${item.Name} (${item.Student_ID}) - ${item.Status}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

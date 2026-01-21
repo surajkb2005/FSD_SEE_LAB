@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Records</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; width: 350px; margin-bottom: 20px; }
+        input { width: 95%; margin-bottom: 10px; padding: 8px; }
+        button { padding: 10px; cursor: pointer; width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>1. Add Student</h3>
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="usn" placeholder="USN">
+        <input type="text" id="dept" placeholder="Department">
+        <input type="text" id="grade" placeholder="Grade">
+        <button onclick="addStudent()">Submit</button>
+    </div>
+
+    <div class="box">
+        <h3>2. Update Grade</h3>
+        <input type="text" id="updateName" placeholder="Enter Name of Student">
+        <input type="text" id="newGrade" placeholder="Enter New Grade">
+        <button onclick="updateGrade()" style="background: #fff3cd;">Update Grade</button>
+    </div>
+
+    <div class="box">
+        <h3>3. View All Students</h3>
+        <button onclick="viewAll()" style="background: #d1ecf1;">Show All Records</button>
+        <div id="results" style="margin-top:10px;"></div>
+    </div>
+
+    <script>
+        // --- POST Request ---
+        async function addStudent() {
+            const data = {
+                Name: document.getElementById("name").value,
+                USN: document.getElementById("usn").value,
+                Department: document.getElementById("dept").value,
+                Grade: document.getElementById("grade").value
+            };
+            const res = await fetch("/add-student", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            alert(result.message);
+        }
+
+        // --- PUT Request ---
+        async function updateGrade() {
+            const data = { 
+                Name: document.getElementById("updateName").value,
+                newGrade: document.getElementById("newGrade").value
+            };
+            
+            const res = await fetch("/update-grade", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(res.ok) alert(result.message);
+        }
+
+        // --- GET Request ---
+        async function viewAll() {
+            const res = await fetch("/all-students");
+            const list = await res.json();
+            const display = document.getElementById("results");
+            
+            console.log(list);
+            //or process the list as below
+            display.innerHTML = "<strong>Student List:</strong><br>";
+            list.forEach(s => {
+                display.innerHTML += `<p>${s.Name} (${s.Department}) - Grade: ${s.Grade}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
