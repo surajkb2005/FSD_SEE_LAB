@@ -10,32 +10,37 @@
   </head>
   <body>
      <div id="root"></div>
+
      <script type="text/babel">
-		   class Qb4a extends React.Component {
-    constructor()
-    {
-        super()
-        this.state=
-        {
-            name:"aaa",
-            address:"bbb",
-            company:"ccc"
+        class Qb4a extends React.Component {
+            constructor()
+            {
+                super()
+                this.state=
+                {
+                    name:"aaa",
+                    address:"bbb",
+                    company:"ccc"
+                }
+            }
+            changeMessage(){
+                this.setState({
+                    name:"newname",
+                    address:"newaddress",
+                    company:"newcompany"
+                })
+            }
+            render() {
+                return (
+                    <div>
+                        <p>{this.state.name} {this.state.address} {this.state.company}</p>
+                        <button onClick={()=>this.changeMessage()}>Change</button>
+                    </div>
+                )
+            }
         }
-    }
-    changeMessage(){
-        this.setState({
-            name:"newname",
-            address:"newaddress"
-        })
-    }
-    render() {
-        return (
-            <div>
-                <p>{this.state.name} {this.state.address} {this.state.company}</p>
-                <button onClick={()=>this.changeMessage()}>Change</button>
-            </div>)}
-}
+
 		ReactDOM.render(<Qb4a />,document.getElementById('root'));
-        </script>	
+    </script>	
   </body>
 </html>
