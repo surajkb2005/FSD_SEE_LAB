@@ -1,6 +1,20 @@
 const express = require("express"); 
 const app = express(); 
 
+app.get("/", (req, res) => { 
+    res.send(`
+        <body>
+            <h1>Welcome to the Branch Selection Page</h1>
+            <p>Select a branch:</p>
+            <ul>
+                <li><a href="/cse">CSE</a></li>
+                <li><a href="/ece">ECE</a></li>
+                <li><a href="/mech">Mechanical</a></li>
+            </ul>
+        </body>
+    `);
+});
+
 app.get("/cse", (req, res) => { 
     // Added background color and font styling
     res.send(`
