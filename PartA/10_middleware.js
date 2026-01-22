@@ -8,14 +8,14 @@ let visitorCount = 0;
 // i. Custom Middleware: Logger
 const logger = (req, res, next) => {
     const timestamp = new Date().toLocaleString();
-    console.log(`[${timestamp}] ${req.method} request to: ${req.url}`);
+    console.log(timestamp," ",req.method,"request to: ",req.url);
     next(); // Pass control to the next middleware function
 };
 
 // ii. Custom Middleware: Visitor Counter
 const countVisitor = (req, res, next) => {
     visitorCount++;
-    console.log(`Total visits: ${visitorCount}`);
+    console.log("Total visits: ",visitorCount);
     next();
 };
 
